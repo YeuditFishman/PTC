@@ -1,6 +1,6 @@
-from sqlalchemy import Column, Integer, String, Float, Date
 from .database import Base
-from sqlalchemy import Column, Integer, String, Float, UniqueConstraint
+from sqlalchemy import Column, Float, Integer, UniqueConstraint
+
 
 class ExchangeRate(Base):
     __tablename__ = "exchange_rates"
@@ -9,4 +9,10 @@ class ExchangeRate(Base):
     month = Column(Integer, nullable=False)
     average_rate = Column(Float, nullable=False)
 
-    __table_args__ = (UniqueConstraint('year', 'month', name='_year_month_uc'),)
+    __table_args__ = (
+        UniqueConstraint(
+            "year",
+            "month",
+            name="_year_month_uc",
+        ),
+    )
