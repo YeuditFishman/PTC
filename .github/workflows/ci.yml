@@ -9,7 +9,7 @@ on:
       - feature/ptc
 
 jobs:
-  build-and-test:
+  build:
     runs-on: ubuntu-latest
 
     steps:
@@ -17,20 +17,12 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Build Docker image
-        run: docker build -t ptc-backend .
+        run: docker build -t ptc-backend ./backend
 
       - name: Run linters (ruff + flake8)
         run: |
-          echo "::group::Running ruff"
           docker run --rm ptc-backend ruff app tests
-          echo "::endgroup::"
-
-          echo "::group::Running flake8"
           docker run --rm ptc-backend flake8 app tests
-          echo "::endgroup::"
 
       - name: Run tests
-        run: |
-          echo "::group::Running pytest"
-          docker run --rm ptc-backend pytest -v
-          echo "::endgroup::"
+        run: docker run --rm ptc-backend pytest -v tests/
