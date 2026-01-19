@@ -1,0 +1,32 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.log
+*.sqlite3
+
+# Environment files
+.env
+*.env
+
+# Docker
+*.dockerignore
+docker-compose.override.yml
+data/db/
+
+# VSCode / IDEs
+.vscode/
+.idea/
+*.sublime-workspace
+*.sublime-project
+
+# Jupyter / Notebook checkpoints
+.ipynb_checkpoints/
+
+# Streamlit cache
+.cache/
+
+# Python virtual environments
+venv/
+.env/

@@ -1,0 +1,38 @@
+version: "3.9"
+
+services:
+  db:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: ptc
+      POSTGRES_PASSWORD: ptc
+      POSTGRES_DB: exchange
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./data/db:/var/lib/postgresql/data
+
+  backend:
+    build: ./backend
+    volumes:
+      - ./backend:/app
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+    environment:
+      POSTGRES_USER: ptc
+      POSTGRES_PASSWORD: ptc
+      POSTGRES_DB: exchange
+      DB_HOST: db
+      DB_PORT: 5432
+      PYTHONPATH: /app
+
+  frontend:
+    build: ./frontend
+    volumes:
+      - ./frontend:/app
+    ports:
+      - "8501:8501"
+    depends_on:
+      - backend
