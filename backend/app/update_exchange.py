@@ -1,19 +1,38 @@
-from .database import SessionLocal
 from datetime import datetime, timedelta
 from io import StringIO
+import logging
 from .models import ExchangeRate
+import os
 import pandas as pd
 import requests
 
+logger = logging.getLogger(__name__)
 
-def fetch_latest_rate(year: int, month: int) -> float:
+BOI_BASE_URL = os.getenv("BOI_BASE_URL")
+BOI_DATAFLOW = os.getenv("BOI_DATAFLOW")
+BOI_FORMAT = os.getenv("BOI_FORMAT")
+BOI_SERIES_CODE = os.getenv("BOI_SERIES_CODE")
+
+
+def add_rate_if_missing(db, year: int, month: int, rate: float):
+    existing = db.query(ExchangeRate).filter_by(year=year, month=month).first()
+    if not existing:
+        db.add(ExchangeRate(year=year, month=month, average_rate=rate))
+        db.commit()
+        logger.info(f"Updated EXR {year}-{month:02d} = {rate}")
+    else:
+        logger.info(f"EXR {year}-{month:02d} already exists, skipping.")
+
+
+def fetch_latest_rate(year: int, month: int) -> float | None:
     startperiod = f"{year}-{month:02d}-01"
     endperiod = f"{year}-{month:02d}-28"
 
     url = (
-        "https://edge.boi.gov.il/FusionEdgeServer/sdmx/v2/data/dataflow/"
-        "BOI.STATISTICS/EXR/1.0/"
-        "?c%5BSERIES_CODE%5D=RER_USD_ILS&format=csv&normalisefreq=M;mean"
+        f"{BOI_BASE_URL}/{BOI_DATAFLOW}/"
+        f"?c[SERIES_CODE]={BOI_SERIES_CODE}"
+        f"&format={BOI_FORMAT}"
+        "&normalisefreq=M;mean"
         f"&startperiod={startperiod}&endperiod={endperiod}"
     )
 
@@ -21,25 +40,14 @@ def fetch_latest_rate(year: int, month: int) -> float:
         response = requests.get(url, verify=False)
         response.raise_for_status()
     except requests.HTTPError as error:
-        print(f"No data available for {year}-{month:02d}: {error}")
+        logger.info(f"No data available for {year}-{month:02d}: {error}")
         return None
 
-    csv_data = StringIO(response.text)
-    df = pd.read_csv(csv_data)
-
-    latest_value = df["OBS_VALUE"].iloc[-1]
-    return float(latest_value)
+    df = pd.read_csv(StringIO(response.text))
+    return float(df["OBS_VALUE"].iloc[-1])
 
 
-def update_latest_month():
-    db = SessionLocal()
-
-    last_entry = (
-        db.query(ExchangeRate)
-        .order_by(ExchangeRate.year.desc(), ExchangeRate.month.desc())
-        .first()
-    )
-
+def next_month(last_entry: ExchangeRate | None) -> tuple[int, int]:
     if last_entry:
         year = last_entry.year
         month = last_entry.month + 1
@@ -50,37 +58,19 @@ def update_latest_month():
         target_date = datetime.now().replace(day=1) - timedelta(days=1)
         year = target_date.year
         month = target_date.month
+    return year, month
 
+
+def update_latest_month(db):
+    last_entry = db.query(ExchangeRate).order_by(
+        ExchangeRate.year.desc(), ExchangeRate.month.desc()
+    ).first()
+    year, month = next_month(last_entry)
     rate = fetch_latest_rate(year, month)
-
     if rate is None:
-        print(
-            f"Skipping update for {year}-{month:02d}, "
-            "no data available yet."
-        )
-        db.close()
+        logger.error(f"{year}-{month:02d}, no data available yet.")
         return
-
-    existing = (
-        db.query(ExchangeRate)
-        .filter_by(year=year, month=month)
-        .first()
-    )
-
-    if not existing:
-        db.add(
-            ExchangeRate(
-                year=year,
-                month=month,
-                average_rate=rate,
-            )
-        )
-        db.commit()
-        print(f"Updated EXR {year}-{month:02d} = {rate}")
-    else:
-        print(f"EXR {year}-{month:02d} already exists, skipping.")
-
-    db.close()
+    add_rate_if_missing(db, year, month, rate)
 
 
 if __name__ == "__main__":
