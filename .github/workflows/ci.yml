@@ -18,10 +18,23 @@ jobs:
 
       - name: Run CI in Docker
         run: |
-          docker run --rm -v ${GITHUB_WORKSPACE}:/app -w /app/backend python:3.12-slim bash -c "
+          docker run --rm -v ${GITHUB_WORKSPACE}:/app -w /app/backend python:3.12-slim bash -c '
             python -m pip install --upgrade pip --trusted-host pypi.org --trusted-host files.pythonhosted.org &&
             pip install --trusted-host pypi.org --trusted-host files.pythonhosted.org -r requirements.txt &&
             pip install --trusted-host pypi.org --trusted-host files.pythonhosted.org flake8 ruff pytest pytest-mock &&
-            
+
             export PYTHONPATH=/app/backend &&
-            echo '--- Running backend linters ---' &&
+            echo "--- Running backend linters ---" &&
+            flake8 app tests &&
+            ruff check app tests &&
+            echo "--- Running backend tests ---" &&
+            pytest -v tests/ &&
+
+            export PYTHONPATH=/app/frontend &&
+            echo "--- Running frontend linters ---" &&
+            flake8 app tests &&
+            ruff check app tests &&
+            echo "--- Running frontend tests ---" &&
+            pytest -v tests/
+          '
+
