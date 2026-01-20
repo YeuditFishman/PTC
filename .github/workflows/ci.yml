@@ -35,7 +35,7 @@ jobs:
       - name: Run backend tests
         run: |
           echo "--- Running backend tests ---"
-          export PYTHONPATH=$PYTHONPATH:/app/backend
+          export PYTHONPATH=${GITHUB_WORKSPACE}/backend
           pytest -v backend/tests/
 
   frontend:
@@ -64,5 +64,6 @@ jobs:
       - name: Run frontend tests
         run: |
           echo "--- Running frontend tests ---"
-          export PYTHONPATH=$PYTHONPATH:/app/frontend
+          export PYTHONPATH=${GITHUB_WORKSPACE}/frontend
           pytest -v frontend/tests/
+
