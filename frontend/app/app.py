@@ -1,6 +1,6 @@
-from src.data_utils import fetch_data, forecast_next_month
+from app.data_utils import fetch_data, forecast_next_month
+from app.viz_utils import plot_line, plot_bar_highlight, styled_table
 import streamlit as st
-from src.viz_utils import plot_line, plot_bar_highlight, styled_table
 
 st.title("PTC Exchange Rates - Part B")
 
