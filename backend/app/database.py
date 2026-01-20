@@ -11,10 +11,13 @@ DB_PASSWORD = os.getenv("POSTGRES_PASSWORD")
 DB_PORT = os.getenv("DB_PORT")
 DB_USER = os.getenv("POSTGRES_USER")
 
-DATABASE_URL = (
-    f"postgresql://{DB_USER}:{DB_PASSWORD}@"
-    f"{DB_HOST}:{DB_PORT}/{DB_NAME}"
-)
+if DB_HOST and DB_USER:
+    DATABASE_URL = (
+        f"postgresql://{DB_USER}:{DB_PASSWORD}@"
+        f"{DB_HOST}:{DB_PORT}/{DB_NAME}"
+    )
+else:
+    DATABASE_URL = "sqlite+pysqlite:///:memory:"
 
 engine = create_engine(DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
