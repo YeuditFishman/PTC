@@ -12,7 +12,9 @@ def startup_event():
             Base.metadata.create_all(bind=engine)
             break
         except Exception as error:
-            logger.warning(f"DB creation failed, retries left {retries}: {error}")
+            logger.warning(
+                f"DB creation failed, retries left {retries}: {error}"
+            )
             retries -= 1
             time.sleep(2)
     if retries == 0:
