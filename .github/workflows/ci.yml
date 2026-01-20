@@ -36,6 +36,7 @@ jobs:
         run: |
           echo "--- Running backend tests ---"
           export PYTHONPATH=${GITHUB_WORKSPACE}/backend
+          export DATABASE_URL="sqlite:///:memory:"
           pytest -v backend/tests/
 
   frontend:
