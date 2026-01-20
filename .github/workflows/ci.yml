@@ -35,6 +35,7 @@ jobs:
       - name: Run backend tests
         run: |
           echo "--- Running backend tests ---"
+          export PYTHONPATH=$PYTHONPATH:/app/backend
           pytest -v backend/tests/
 
   frontend:
@@ -63,4 +64,5 @@ jobs:
       - name: Run frontend tests
         run: |
           echo "--- Running frontend tests ---"
+          export PYTHONPATH=$PYTHONPATH:/app/frontend
           pytest -v frontend/tests/
