@@ -1,5 +1,7 @@
-pandas
 matplotlib
+pandas
+pytest
+python-dotenv
 seaborn
-requests
 streamlit
+requests
