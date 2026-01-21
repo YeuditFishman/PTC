@@ -1,6 +1,9 @@
+from dotenv import load_dotenv
 import os
 from sqlalchemy import create_engine
 from sqlalchemy.orm import declarative_base, sessionmaker
+
+load_dotenv()
 
 DB_HOST = os.getenv("DB_HOST")
 DB_NAME = os.getenv("POSTGRES_DB")
