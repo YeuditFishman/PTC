@@ -1,0 +1,11 @@
+fastapi
+httpx>=0.27.0
+pandas
+psycopg2-binary
+pydantic
+pytest
+pytest-mock
+python-dotenv
+requests
+sqlalchemy
+uvicorn
