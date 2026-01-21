@@ -1,8 +1,8 @@
-import time
-from datetime import datetime
 from app.database import SessionLocal
 from app.update_exchange import update_latest_month
+from datetime import datetime
 import logging
+import time
 
 logger = logging.getLogger(__name__)
 
@@ -12,8 +12,8 @@ def run_monthly_update():
     try:
         update_latest_month(db)
         logger.info("Monthly update completed successfully.")
-    except Exception as e:
-        logger.error(f"Error during monthly update: {e}")
+    except Exception as error:
+        logger.error(f"Error during monthly update: {error}")
     finally:
         db.close()
 

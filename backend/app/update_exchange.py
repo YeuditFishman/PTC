@@ -71,7 +71,3 @@ def update_latest_month(db):
         logger.error(f"{year}-{month:02d}, no data available yet.")
         return
     add_rate_if_missing(db, year, month, rate)
-
-
-if __name__ == "__main__":
-    update_latest_month()
