@@ -7,6 +7,15 @@ if not BACKEND_URL:
     raise RuntimeError("BACKEND_URL is not set")
 
 
+def compute_diff_matrix(df: pd.DataFrame) -> pd.DataFrame:
+    df = df.copy()
+    df['forecast'] = df['average_rate'].rolling(3).mean().shift(1)
+    df['diff'] = df['average_rate'] - df['forecast']
+    diff_matrix = df.pivot(index='year', columns='month', values='diff')
+    diff_matrix.loc['Avg'] = diff_matrix.mean()
+    return diff_matrix
+
+
 def fetch_data() -> pd.DataFrame:
     response = requests.get(BACKEND_URL)
     response.raise_for_status()
@@ -28,15 +37,6 @@ def forecast_next_month(df: pd.DataFrame) -> tuple[int, int, float]:
         next_month = 1
         next_year += 1
     return next_year, next_month, last_3_avg
-
-
-def compute_diff_matrix(df: pd.DataFrame) -> pd.DataFrame:
-    df = df.copy()
-    df['forecast'] = df['average_rate'].rolling(3).mean().shift(1)
-    df['diff'] = df['average_rate'] - df['forecast']
-    diff_matrix = df.pivot(index='year', columns='month', values='diff')
-    diff_matrix.loc['Avg'] = diff_matrix.mean()
-    return diff_matrix
 
 
 def multiply_matrices(df: pd.DataFrame) -> pd.DataFrame:
