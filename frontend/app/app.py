@@ -35,9 +35,9 @@ st.subheader("Part C: Difference and Product Matrix")
 if st.button("Show Part C Matrix"):
     diff_matrix = compute_diff_matrix(df)
     product_matrix = multiply_matrices(df)
-    
+
     st.subheader("Difference Matrix (Actual - Forecast)")
     st.dataframe(diff_matrix.style.background_gradient(cmap='coolwarm'))
-    
+
     st.subheader("Product Matrix (Part B * Difference)")
     st.dataframe(product_matrix.style.background_gradient(cmap='coolwarm'))
