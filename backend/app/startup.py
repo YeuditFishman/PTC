@@ -6,7 +6,7 @@ logger = logging.getLogger(__name__)
 
 
 def startup_event():
-    retries = 5
+    retries = 15
     while retries:
         try:
             Base.metadata.create_all(bind=engine)
@@ -16,6 +16,6 @@ def startup_event():
                 f"DB creation failed, retries left {retries}: {error}"
             )
             retries -= 1
-            time.sleep(2)
+            time.sleep(3)
     if retries == 0:
         raise RuntimeError("Database is not available")
